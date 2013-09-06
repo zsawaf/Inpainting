@@ -1,0 +1,957 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0106 
+header_name {.h} 
+code_name {.cxx}
+decl {\#include "fltk_includes.h"} {} 
+
+class VisCompUI {open
+} {
+  decl {vil_image_view<vil_rgb<vxl_byte> > left_im;} {}
+  decl {vil_image_view<vil_rgb<vxl_byte> > right_im;} {}
+  decl {matting M;} {}
+  decl {int inpainting_iterations_per_step;} {}
+  decl {inpainting *I;} {}
+  Function {show()} {open
+  } {
+    code {mainWindow->show();} {}
+  }
+  Function {interactive_load_image(vcl_string title)} {open return_type {vil_image_view<vil_rgb<vxl_byte> >}
+  } {
+    code {vil_image_view<vil_rgb<vxl_byte> > im;
+char* str;
+
+// load image using VXL libary routines
+if ((str = fl_file_chooser(title.c_str(), "", "")) == NULL)
+   // if there was a problem with the filename or the load was cancelled, we return 
+   // an empty image
+   return im;
+im = load_image(str);
+// check if the loaded image contains valid data (it would not
+// if there was a problem with image loading)
+if ((bool)im == false) 
+   fl_alert("VisCompUI::interactive_load_image(): Error opening image file.");
+return im;} {}
+  }
+  Function {interactive_load_image1(vcl_string title)} {open return_type {vil_image_view<vxl_byte>}
+  } {
+    code {vil_image_view<vxl_byte> im;
+char* str;
+
+// load image using VXL libary routines
+if ((str = fl_file_chooser(title.c_str(), "", "")) == NULL)
+   // if there was a problem with the filename or the load was cancelled, we return 
+   // an empty image
+   return im;
+im = load_image1(str);
+// check if the loaded image contains valid data (it would not
+// if there was a problem with image loading)
+if ((bool)im == false) 
+   fl_alert("VisCompUI::interactive_load_image1(): Error opening image file.");
+return im;} {}
+  }
+  Function {set_matting(matting m)} {} {
+    code {M = m;} {}
+  }
+  Function {display_matting_image(ImDraw* panel, matting::im_type imt)} {return_type void
+  } {
+    code {// display the specified image stored in the matting data structure on a display panel
+// if the set routine returns false (eg. the image specified by the user does not exist)
+if (panel->set(M.get(imt),M.get_title(imt)) == false)
+        // return a message
+	fl_alert("VisCompUI::display_matting_image(): Matting image is not available for display.");} {}
+  }
+  Function {display_matting_image1(ImDraw* panel, matting::im_type imt)} {return_type void
+  } {
+    code {// display the specified image stored in the matting data structure on a display panel
+// if the set routine returns false (eg. the image specified by the user does not exist)
+// this function is identical to dispay_matting_image(), except that it handles
+// 1-band (aka 1-plane, aka grayscale images)
+// the only difference is the use of the get1() accessor instead of get()
+if (panel->set(M.get1(M.Alpha),M.get_title(M.Alpha)) == false)
+        // return a message
+	fl_alert("VisCompUI::display_matting_image1(): Matting image is not available for display.");} {}
+  }
+  Function {load_and_display_matting_image(ImDraw* panel, matting::im_type imt)} {return_type void
+  } {
+    code {// load an image interactively and store it in the matting data structure
+// as specified by the "image type" parameter imt
+if (M.set(imt, interactive_load_image(M.get_title(imt))) == true)
+	// if the image was loaded in the data structure correctly, show it in the
+	// specified panel    
+	display_matting_image(panel,imt);
+else
+	fl_alert("VisCompUI::load_and_display_matting_image(): Image load failed.");} {}
+  }
+  Function {set_inpainting(inpainting* inp)} {} {
+    code {I = inp;} {}
+  }
+  Function {display_inpainting_image(ImDraw* panel, inpainting::im_type imt)} {return_type void
+  } {
+    code {// display the specified image stored in the inpainting data structure on a display panel
+// if the set routine returns false (eg. the image specified by the user does not exist)
+if (panel->set(I->get(imt),I->get_title(imt)) == false)
+        // return a message
+	fl_alert("VisCompUI::display_matting_image(): Inpainting image is not available for display.");} {}
+  }
+  Function {display_inpainting_image1(ImDraw* panel, inpainting::im_type imt)} {return_type void
+  } {
+    code {// display the specified image stored in the inpainting data structure on a display panel
+// if the set routine returns false (eg. the image specified by the user does not exist)
+// this function is identical to dispay_inpainting_image(), except that it handles
+// 1-band (aka 1-plane, aka grayscale images)
+// the only difference is the use of the get1() accessor instead of get()
+
+   if (panel->set(I->get1(imt),I->get_title(imt)) == false)
+        // return a message
+	fl_alert("VisCompUI::display_inpainting_image1(): Inpainting image is not available for display.");} {}
+  }
+  Function {load_and_display_inpainting_image(ImDraw* panel, inpainting::im_type imt)} {return_type void
+  } {
+    code {// load an image interactively and store it in the inpainting data structure
+// as specified by the "image type" parameter imt
+if (I->set(imt, interactive_load_image(I->get_title(imt))) == true)
+	// if the image was loaded in the data structure correctly, show it in the
+	// specified panel    
+	display_inpainting_image(panel,imt);
+else
+	fl_alert("VisCompUI::load_and_display_inpainting_image(): Image load failed.");} {}
+  }
+  Function {load_and_display_inpainting_image1(ImDraw* panel, inpainting::im_type imt)} {open return_type void
+  } {
+    code {// load a 1-band image interactively and store it in the inpainting data structure
+// as specified by the "image type" parameter imt
+if (I->set(imt, interactive_load_image1(I->get_title(imt))) == true)
+	// if the image was loaded in the data structure correctly, show it in the
+	// specified panel    
+	display_inpainting_image1(panel,imt);
+else
+	fl_alert("VisCompUI::load_and_display_inpainting_image1(): Image load failed.");} {}
+  }
+  Function {VisCompUI()} {open
+  } {
+    Fl_Window mainWindow {
+      label {Visual Computing User Interface} open
+      xywh {630 321 850 505} type Double
+      code0 {\#include "matting/matting.h"}
+      code1 {\#include "vxl_includes.h"}
+      code2 {\#include "inpainting/inpainting.h"} visible
+    } {
+      Fl_Group {} {
+        xywh {0 1 850 25}
+      } {}
+      Fl_Menu_Bar {} {
+        label {Main Menu Bar} open
+        xywh {0 1 850 25} box BORDER_BOX
+      } {
+        submenu {} {
+          label File
+          xywh {0 0 100 20}
+        } {
+          menuitem {} {
+            label {Open Left Image}
+            callback {left_panel->set(interactive_load_image("Left Image"), "Left Image");}
+            xywh {0 0 100 20}
+            code0 {\#include "file/load_image.h"}
+          }
+          menuitem {} {
+            label {Open Right Image}
+            callback {right_panel->set(interactive_load_image("Right Image"), "Right Image");}
+            xywh {10 10 100 20} divider
+          }
+          menuitem {} {
+            label {Open Drawing}
+            callback {\#include "file_callbacks/callback_open_drawing.h"}
+            xywh {10 10 100 20} deactivate
+          }
+          menuitem {} {
+            label {Save Thresholded Image}
+            callback {\#include "file_callbacks/callback_save_image.h"}
+            xywh {20 20 100 20} deactivate
+          }
+          menuitem {} {
+            label {Save Drawing}
+            callback {\#include "file_callbacks/callback_save_drawing.h"}
+            xywh {15 15 100 20} deactivate
+          }
+          menuitem {} {
+            label Quit
+            callback {exit(1);}
+            xywh {25 25 100 20} shortcut 0x80071
+          }
+        }
+        submenu {} {
+          label {Triangulation Matting} open
+          xywh {0 0 100 20}
+        } {
+          menuitem {} {
+            label {Display Control}
+            callback {if (mattingDisplayWindow->visible() == false) {
+   mattingDisplayWindow->show();
+} else
+   mattingDisplayWindow->hide();}
+            xywh {10 10 100 20} divider
+          }
+          submenu {} {
+            label Load
+            xywh {0 0 100 20}
+          } {
+            menuitem {} {
+              label back1
+              callback {// load an image interactively and store it as the Background 1 image
+// and, if successful, show it in the left panel
+load_and_display_matting_image(left_panel, M.Back1);}
+              xywh {5 5 100 20}
+              code0 {/* this snippet of code allows the menu item to have a variable appearance */}
+              code1 {/* in the actual UI, the menu item's label will be the string returned by the get_title() method */}
+              code2 {/* see the file matting.cxx for definitions of these labels */}
+              code3 {o->label(M.get_title(M.Back1).c_str());}
+            }
+            menuitem {} {
+              label back2
+              callback {// load an image interactively and store it as the Background 2 image
+// and, if successful, show it in the right panel
+load_and_display_matting_image(right_panel, M.Back2);}
+              xywh {15 15 100 20}
+              code0 {/* this snippet of code allows the menu item to have a variable appearance */}
+              code1 {/* in the actual UI, the menu item's label will be the string returned by the get_title() method*/}
+              code2 {/* see the file matting.cxx for definitions of these labels */}
+              code3 {o->label(M.get_title(M.Back2).c_str());}
+            }
+            menuitem {} {
+              label comp1
+              callback {// load an image interactively and store it as the Composite 1 image
+// and, if successful, show it in the left panel
+load_and_display_matting_image(left_panel, M.Comp1);}
+              xywh {25 25 100 20}
+              code0 {/* this snippet of code allows the menu item to have a variable appearance*/}
+              code1 {/* in the actual UI, the menu item's label will be the string returned by the get_title() method*/}
+              code2 {/* see the file matting.cxx for definitions of these labels*/}
+              code3 {o->label(M.get_title(M.Comp1).c_str());}
+            }
+            menuitem {} {
+              label comp2
+              callback {// load an image interactively and store it as the Composite 2 image
+// and, if successful, show it in the right panel
+load_and_display_matting_image(right_panel, M.Comp2);}
+              xywh {35 35 100 20}
+              code0 {/* this snippet of code allows the menu item to have a variable appearance*/}
+              code1 {/* in the actual UI, the menu item's label will be the string returned by the get_title() method*/}
+              code2 {/* see the file matting.cxx for definitions of these labels*/}
+              code3 {o->label(M.get_title(M.Comp2).c_str());}
+            }
+          }
+          menuitem {} {
+            label {Run Algorithm}
+            callback {{
+        // if we have already ran the algorithm on the current set of
+        // input images, we don't need to run it again
+	if (M.compute() == true) {
+		fl_alert("Separation successful.\\
+			\\nUse \\"Matting/Show Alpha\\" to view the alpha matte\\nand \\"Matting/Show Foreground\\" to view the foreground object");
+
+
+		// show the alpha matte in the left canvas
+
+		// first we retrieve the computed alpha matte
+        // then we display it and show the title string
+        // we use to describe alpha mattes 
+		left_panel->set(M.get1(M.Alpha), M.get_title(M.Alpha));
+
+		// show the object in the right canvas
+		right_panel->set(M.get(M.Object), M.get_title(M.Object));
+	} else
+		fl_alert("Triangulation matting cannot be applied yet.");
+}}
+            xywh {0 0 100 20}
+          }
+          menuitem {} {
+            label {Create Composite}
+            callback {{
+  vil_image_view<vil_rgb<vxl_byte> > im1;
+  vil_image_view<vil_rgb<vxl_byte> > im2;
+
+  // load an image interactively and set its title to be
+  // the string we use to describe new background images 
+  im1 = interactive_load_image(M.get_title(M.NewBack));
+  // if the image returned is empty
+  if ((bool) im1 == false)
+	  fl_alert("vil_load(): Error opening image file.");
+  else // ok, we can do the compositing operation
+	  if (M.compute_composite(im1, im2) == true) {
+         // show the background image in the left panel
+		 left_panel->set(im1, M.get_title(M.NewBack));
+         // show the new composite in the right panel
+		 right_panel->set(im2, M.get_title(M.NewComp));
+	  } else
+		  fl_alert("compute_composite(): Composite cannot be computed");
+}}
+            xywh {10 10 100 20} divider
+          }
+        }
+        submenu {} {
+          label Inpainting
+          xywh {0 0 100 20}
+        } {
+          menuitem {} {
+            label {Display Control}
+            callback {if (inpaintingDisplayWindow->visible() == false) {
+   inpaintingDisplayWindow->show();
+} else
+   inpaintingDisplayWindow->hide();}
+            xywh {20 20 100 20} shortcut 0x40064 divider
+          }
+          submenu {} {
+            label Load
+            xywh {10 10 100 20}
+          } {
+            menuitem {} {
+              label source
+              callback {// load an image interactively and store it as the Background 1 image
+// and, if successful, show it in the left panel
+load_and_display_inpainting_image(left_panel, I->Source);}
+              xywh {15 15 100 20} shortcut 0x80073
+              code0 {/* this snippet of code allows the menu item to have a variable appearance */}
+              code1 {/* in the actual UI, the menu item's label will be the string returned by the get_title() method */}
+              code2 {/* see the file inpainting.cxx for definitions of these labels */}
+              code3 {o->label(I->get_title(I->Source).c_str());}
+            }
+            menuitem {} {
+              label mask
+              callback {// load an image interactively and store it as the Background 2 image
+// and, if successful, show it in the right panel
+load_and_display_inpainting_image1(right_panel, I->Init_Filled);}
+              xywh {25 25 100 20} shortcut 0x80064
+              code0 {/* this snippet of code allows the menu item to have a variable appearance */}
+              code1 {/* in the actual UI, the menu item's label will be the string returned by the get_title() method*/}
+              code2 {/* see the file inpainting.cxx for definitions of these labels */}
+              code3 {o->label(I->get_title(I->Init_Filled).c_str());}
+            }
+          }
+          submenu {} {
+            label Save open
+            xywh {15 15 100 20}
+          } {
+            menuitem {} {
+              label inpainted
+              callback {{
+   vil_image_view<vxl_byte> im;
+   im = I->get(I->Inpainted);
+   if ((bool) im == true) {
+      char* fname;
+      fname = fl_file_chooser(I->get_title(I->Inpainted).c_str(), "", "");
+      if (fname != NULL)
+            vil_save((vil_image_view<vxl_byte>)im, fname);
+   } else
+      fl_alert("inpainting::get(): inpainted image not available.");
+}}
+              xywh {15 15 100 20} shortcut 0x80069
+              code3 {o->label(I->get_title(I->Inpainted).c_str());}
+            }
+            menuitem {} {
+              label mask
+              callback {{
+  vil_image_view<bool> mask;
+  ImDraw* panel = 0;
+  mask.clear();
+
+  // if the left panel is in drawing mode
+  if (left_panel->drawing_mode())
+     panel = left_panel;
+  else if (right_panel->drawing_mode())
+     panel = right_panel;
+  
+  if (panel->canonical_view() == false)
+     fl_alert("Press the Canonical View button before saving mask");
+  else 
+    if (panel != 0) {
+	mask = panel->get_alpha_image();
+	if ((bool) mask == true) {
+     		// get the already-drawn mask and save it to a file
+	        char* fname;
+	   
+	        fname = fl_file_chooser("Save Drawn Mask to File", "", "");
+                if (fname != NULL) {
+                   if (I->set(I->Init_Filled,mask ) == true)
+		        vil_save(I->get1(I->Init_Filled), fname);
+        	} else
+	     		fl_alert("VisCompUI:vil_save(): Image save failed.");
+  	  } else
+        	fl_alert("VisCompUI: Drawing not available");
+   } else
+       fl_alert("VisCompUI: at least one panel must be in drawing mode!");
+}}
+              xywh {15 15 100 20} shortcut 0x8006d
+              code3 {o->label(I->get_title(I->Init_Filled).c_str());}
+            }
+          }
+          submenu {} {
+            label Transfer open
+            xywh {0 0 100 20} divider
+          } {
+            menuitem {} {
+              label {Inpainted -> Source}
+              callback {{
+   vil_image_view<vil_rgb<vxl_byte> > im;
+
+   im = I->get(I->Inpainted);
+   if ((bool) im == true)
+        if (I->set(I->Source, im) == true)
+		display_inpainting_image(left_panel,I->Source);
+        else
+		fl_alert("inpainting::set() cannot convert to source image for inpainting");
+   else 
+       fl_alert("inpainting::get(): Inpainted image not available");
+}}
+              xywh {85 85 100 20} shortcut 0x40069
+            }
+            menuitem {} {
+              label {Drawing -> Initial Mask}
+              callback {{
+  vil_image_view<bool> mask;
+  ImDraw* panel = 0;
+
+  // if the left panel is in drawing mode
+  if (left_panel->drawing_mode())
+     panel = left_panel;
+  else if (right_panel->drawing_mode())
+     panel = right_panel;
+  
+  if (panel->canonical_view() == false)
+     fl_alert("Press the Canonical View button before transfer");
+  else 
+    if (panel != 0) {
+	mask = panel->get_alpha_image();
+	if ((bool) mask == true) {
+     		// get the already-drawn mask and set it to be the
+        	// mask used by the inpainting algorithm
+ 		if (I->set(I->Init_Filled,mask ) == true) {
+   			// if the image was loaded in the data structure correctly, show it in the
+	     		// specified panel
+			panel->clear_objects();    
+             		display_inpainting_image1(panel,I->Init_Filled);
+        	} else
+	     		fl_alert("VisCompUI: Image transfer failed.");
+  	  } else
+        	fl_alert("VisCompUI: Drawing not available");
+   } else
+       fl_alert("VisCompUI: at least one panel must be in drawing mode!");
+}}
+              xywh {75 75 100 20} shortcut 0x4006d
+            }
+          }
+          menuitem {} {
+            label {Run Algorithm}
+            callback {{
+        // if we have already ran the algorithm on the current set of
+        // input images, we don't need to run it again
+	if (I->compute() == false)
+		fl_alert("Inpainting cannot be performed yet.");
+        mainWindow->redraw();
+}}
+            xywh {25 25 100 20} shortcut 0x80072
+          }
+          menuitem {} {
+            label {Step Algorithm}
+            callback {{
+        // if we have already ran the algorithm on the current set of
+        // input images, we don't need to run it again
+	if (I->compute(inpainting_iterations_per_step) == false)
+		fl_alert("Inpainting cannot be performed yet.");
+    mainWindow->redraw();
+}}
+            xywh {35 35 100 20} shortcut 0x8006e divider
+          }
+          menuitem {} {
+            label {Mask Undo}
+            callback {// undo the last drawing operation
+if (left_panel->drawing_mode()) 
+	left_panel->undo();
+else if (right_panel->drawing_mode())
+	right_panel->undo();}
+            xywh {50 50 100 20} shortcut 0x4007a
+          }
+          menuitem {} {
+            label {Mask Clear }
+            callback {// undo the last drawing operation
+if (left_panel->drawing_mode())
+	left_panel->clear_objects();
+else if (right_panel->drawing_mode())
+	right_panel->clear_objects();}
+            xywh {60 60 100 20} shortcut 0x40063
+          }
+        }
+      }
+      Fl_Choice {} {
+        label {Mode Selection}
+        tooltip {Choose the operating mode of the user interface} xywh {5 35 105 25} down_box BORDER_BOX labeltype NO_LABEL
+      } {
+        menuitem {} {
+          label Browse
+          callback {left_panel->set_browsing_mode();
+right_panel->set_browsing_mode();}
+          xywh {0 0 100 20}
+        }
+        menuitem {} {
+          label {Draw Left}
+          callback {left_panel->set_drawing_mode();
+right_panel->set_browsing_mode();}
+          xywh {0 0 100 20}
+        }
+        menuitem {} {
+          label {Draw Right}
+          callback {right_panel->set_drawing_mode();
+left_panel->set_browsing_mode();}
+          xywh {10 10 100 20}
+        }
+      }
+      Fl_Group {} {
+        xywh {115 35 360 455}
+      } {
+        Fl_Box left_panel {
+          tooltip {Browse mode: left-click recenters image
+Draw mode: left-drag draws rectangle} xywh {115 60 360 360} when 1
+          code0 {\#include "gl/glutils.h"}
+          code1 {\#include "imdraw/imdraw.h"}
+          class ImDraw
+        }
+        Fl_Output left_pos {
+          label {Cursor:}
+          tooltip {(i,j) pixel coordinates at mouse position} xywh {285 430 100 20} box FLAT_BOX color 49 labelsize 10 textsize 10
+        }
+        Fl_Output left_val {
+          label {Value:}
+          tooltip {(R,G,B) values of pixel at mouse position} xywh {285 450 100 20} box FLAT_BOX color 49 labelsize 10 textsize 10
+        }
+        Fl_Input left_mag {
+          label {Zoom:}
+          callback {{
+  double new_mag;
+
+  sscanf(left_mag->value(),"%lg", &new_mag);
+  left_panel->mag(new_mag);
+}}
+          tooltip {zoom<ENTER>
+sets the magnification of current image} xywh {175 430 60 20} labelsize 10 when 8 textsize 10
+        }
+        Fl_Input left_center_i {
+          label {Center I:}
+          callback {{
+  int i;
+
+  sscanf(((Fl_Input *)o)->value(),"%d", &i);
+  left_panel->recenter_i(i);
+}}
+          tooltip {Center image on pixel (i,j)} xywh {175 450 60 20} labelsize 10 when 8 textsize 10
+        }
+        Fl_Input left_center_j {
+          label {Center J:}
+          callback {{
+  int j;
+
+  sscanf(((Fl_Input *)o)->value(),"%d", &j);
+  left_panel->recenter_j(j);
+}}
+          tooltip {Center image on pixel (i,j)} xywh {175 470 60 20} labelsize 10 when 8 textsize 10
+        }
+        Fl_Output left_title {
+          label Title
+          xywh {115 35 360 20} box FLAT_BOX color 49 labeltype NO_LABEL labelfont 1
+        }
+        Fl_Button {} {
+          label {Canonical view}
+          callback {left_panel->set_canonical_view();}
+          xywh {250 470 105 20} color 7 labelsize 10 align 16
+        }
+      }
+      Fl_Group {} {
+        xywh {480 35 360 455}
+      } {
+        Fl_Box right_panel {
+          tooltip {Browse mode: left-click recenters image
+Draw mode: left-drag draws rectangle} xywh {480 60 360 360} when 1
+          code0 {\#include "gl/glutils.h"}
+          code1 {\#include "imdraw/imdraw.h"}
+          class ImDraw
+        }
+        Fl_Output right_pos {
+          label {Cursor:}
+          tooltip {(i,j) pixel coordinates at mouse position} xywh {650 430 100 20} box FLAT_BOX color 49 labelsize 10 textsize 10
+        }
+        Fl_Output right_val {
+          label {Value:}
+          tooltip {(R,G,B) values of pixel at mouse position} xywh {650 450 100 20} box FLAT_BOX color 49 labelsize 10 textsize 10
+        }
+        Fl_Input right_mag {
+          label {Zoom:}
+          callback {{
+  double new_mag;
+
+  sscanf(right_mag->value(),"%lg", &new_mag);
+  right_panel->mag(new_mag);
+}}
+          tooltip {zoom<ENTER>
+sets the magnification of current image} xywh {540 430 60 20} labelsize 10 when 8 textsize 10
+        }
+        Fl_Input right_center_i {
+          label {Center I:}
+          callback {{
+  int i;
+
+  sscanf(((Fl_Input *)o)->value(),"%d", &i);
+  right_panel->recenter_i(i);
+}}
+          tooltip {Center image on pixel (i,j)} xywh {540 450 60 20} labelsize 10 when 8 textsize 10
+        }
+        Fl_Input right_center_j {
+          label {Center J:}
+          callback {{
+  int j;
+
+  sscanf(((Fl_Input *)o)->value(),"%d", &j);
+  right_panel->recenter_j(j);
+}}
+          tooltip {Center image on pixel (i,j)} xywh {540 470 60 20} labelsize 10 when 8 textsize 10
+        }
+        Fl_Output right_title {
+          label Title
+          xywh {480 35 360 20} box FLAT_BOX color 49 labeltype NO_LABEL labelfont 1
+        }
+        Fl_Button {} {
+          label {Canonical view}
+          callback {right_panel->set_canonical_view();}
+          xywh {615 470 105 20} color 7 labelsize 10 align 16
+        }
+      }
+    }
+    Fl_Window mattingDisplayWindow {
+      label {Matting Display Control} open
+      xywh {67 591 373 55} type Double hide
+    } {
+      Fl_Choice {} {
+        label {Left Image}
+        tooltip {Choose the operating mode of the user interface} xywh {5 20 150 25} down_box BORDER_BOX align 5
+      } {
+        menuitem {} {
+          label {  }
+          xywh {0 0 100 20}
+        }
+        menuitem {} {
+          label back1
+          callback {// display the image in a panel of the UI
+// the function below is defined in fluid
+display_matting_image(left_panel, M.Back1);}
+          xywh {10 10 100 20}
+          code0 {/* this snippet of code allows the menu item to have a variable appearance */}
+          code1 {/* in the actual UI, the menu item's label will be the string returned by the get_title() method*/}
+          code2 {/* see the file matting.cxx for definitions of these labels */}
+          code3 {o->label(M.get_title(M.Back1).c_str());}
+        }
+        menuitem {} {
+          label back2
+          callback {// display the image in a panel of the UI
+// the function below is defined in fluid
+display_matting_image(left_panel, M.Back2);}
+          xywh {20 20 100 20}
+          code0 {/* this snippet of code allows the menu item to have a variable appearance */}
+          code1 {/* in the actual UI, the menu item's label will be the string returned by the get_title() method*/}
+          code2 {/* see the file matting.cxx for definitions of these labels */}
+          code3 {o->label(M.get_title(M.Back2).c_str());}
+        }
+        menuitem {} {
+          label comp1
+          callback {// display the image in a panel of the UI
+// the function below is defined in fluid
+display_matting_image(left_panel, M.Comp1);}
+          xywh {30 30 100 20}
+          code0 {/* this snippet of code allows the menu item to have a variable appearance */}
+          code1 {/* in the actual UI, the menu item's label will be the string returned by the get_title() method*/}
+          code2 {/* see the file matting.cxx for definitions of these labels */}
+          code3 {o->label(M.get_title(M.Comp1).c_str());}
+        }
+        menuitem {} {
+          label comp2
+          callback {// display the image in a panel of the UI
+// the function below is defined in fluid
+display_matting_image(left_panel, M.Comp2);}
+          xywh {40 40 100 20}
+          code0 {/* this snippet of code allows the menu item to have a variable appearance */}
+          code1 {/* in the actual UI, the menu item's label will be the string returned by the get_title() method*/}
+          code2 {/* see the file matting.cxx for definitions of these labels */}
+          code3 {o->label(M.get_title(M.Comp2).c_str());}
+        }
+        menuitem {} {
+          label alpha
+          callback {// display the image in a panel of the UI
+// the function below is defined in fluid
+// this function is used for displaying 1-band images (eg. alpha mattes)
+display_matting_image1(left_panel, M.Alpha);}
+          xywh {50 50 100 20}
+          code0 {/* this snippet of code allows the menu item to have a variable appearance */}
+          code1 {/* in the actual UI, the menu item's label will be the string returned by the get_title() method*/}
+          code2 {/* see the file matting.cxx for definitions of these labels */}
+          code3 {o->label(M.get_title(M.Alpha).c_str());}
+        }
+        menuitem {} {
+          label object
+          callback {// display the image in a panel of the UI
+// the function below is defined in fluid
+display_matting_image(left_panel, M.Object);}
+          xywh {60 60 100 20}
+          code0 {/* this snippet of code allows the menu item to have a variable appearance */}
+          code1 {/* in the actual UI, the menu item's label will be the string returned by the get_title() method*/}
+          code2 {/* see the file matting.cxx for definitions of these labels */}
+          code3 {o->label(M.get_title(M.Object).c_str());}
+        }
+        menuitem {} {
+          label nback
+          callback {// display the image in a panel of the UI
+// the function below is defined in fluid
+display_matting_image(left_panel, M.NewBack);}
+          xywh {70 70 100 20}
+          code0 {/* this snippet of code allows the menu item to have a variable appearance */}
+          code1 {/* in the actual UI, the menu item's label will be the string returned by the get_title() method*/}
+          code2 {/* see the file matting.cxx for definitions of these labels */}
+          code3 {o->label(M.get_title(M.NewBack).c_str());}
+        }
+        menuitem {} {
+          label ncomp
+          callback {// display the image in a panel of the UI
+// the function below is defined in fluid
+display_matting_image(left_panel, M.NewComp);}
+          xywh {80 80 100 20}
+          code0 {/* this snippet of code allows the menu item to have a variable appearance */}
+          code1 {/* in the actual UI, the menu item's label will be the string returned by the get_title() method*/}
+          code2 {/* see the file matting.cxx for definitions of these labels */}
+          code3 {o->label(M.get_title(M.NewComp).c_str());}
+        }
+      }
+      Fl_Choice {} {
+        label {Right  Image} open selected
+        tooltip {Choose the operating mode of the user interface} xywh {165 20 150 25} down_box BORDER_BOX align 5
+      } {
+        menuitem {} {
+          label {  }
+          xywh {10 10 100 20}
+        }
+      }
+    }
+    code {inpainting_iterations_per_step = 1;} {}
+    Fl_Window inpaintingDisplayWindow {
+      label {Inpainting Control}
+      xywh {-32000 -32000 320 146} type Double hide
+    } {
+      Fl_Choice {} {
+        label {Left Image}
+        tooltip {Choose the image to display in the left panel} xywh {5 20 150 25} down_box BORDER_BOX align 5
+      } {
+        menuitem {} {
+          label {  }
+          xywh {0 0 100 20}
+        }
+        menuitem {} {
+          label source
+          callback {// display the image in a panel of the UI
+// the function below is defined in fluid
+display_inpainting_image(left_panel, I->Source);
+I->debug_display_left(I->Source);}
+          xywh {10 10 100 20}
+          code0 {/* this snippet of code allows the menu item to have a variable appearance */}
+          code1 {/* in the actual UI, the menu item's label will be the string returned by the get_title() method*/}
+          code2 {/* see the file inpainting.cxx for definitions of these labels */}
+          code3 {o->label(I->get_title(I->Source).c_str());}
+        }
+        menuitem {} {
+          label mask
+          callback {// display the image in a panel of the UI
+// the function below is defined in fluid
+// this function is used for displaying 1-band images 
+display_inpainting_image1(left_panel, I->Init_Filled);
+I->debug_display_left(I->Init_Filled);}
+          xywh {50 50 100 20}
+          code0 {/* this snippet of code allows the menu item to have a variable appearance */}
+          code1 {/* in the actual UI, the menu item's label will be the string returned by the get_title() method*/}
+          code2 {/* see the file inpainting.cxx for definitions of these labels */}
+          code3 {o->label(I->get_title(I->Init_Filled).c_str());}
+        }
+        menuitem {} {
+          label {fill front}
+          callback {// display the image in a panel of the UI
+// the function below is defined in fluid
+// this function is used for displaying 1-band images 
+display_inpainting_image1(left_panel, I->Fill_Front);
+I->debug_display_left(I->Fill_Front);}
+          xywh {60 60 100 20}
+          code0 {/* this snippet of code allows the menu item to have a variable appearance */}
+          code1 {/* in the actual UI, the menu item's label will be the string returned by the get_title() method*/}
+          code2 {/* see the file inpainting.cxx for definitions of these labels */}
+          code3 {o->label(I->get_title(I->Fill_Front).c_str());}
+        }
+        menuitem {} {
+          label unfilled
+          callback {// display the image in a panel of the UI
+// the function below is defined in fluid
+// this function is used for displaying 1-band images 
+display_inpainting_image1(left_panel, I->Unfilled);
+I->debug_display_left(I->Unfilled);}
+          xywh {60 60 100 20}
+          code0 {/* this snippet of code allows the menu item to have a variable appearance */}
+          code1 {/* in the actual UI, the menu item's label will be the string returned by the get_title() method*/}
+          code2 {/* see the file inpainting.cxx for definitions of these labels */}
+          code3 {o->label(I->get_title(I->Unfilled).c_str());}
+        }
+        menuitem {} {
+          label confidence
+          callback {// display the image in a panel of the UI
+// the function below is defined in fluid
+// this function is used for displaying 1-band images 
+display_inpainting_image1(left_panel, I->Confidence);
+I->debug_display_left(I->Confidence);}
+          xywh {60 60 100 20}
+          code0 {/* this snippet of code allows the menu item to have a variable appearance */}
+          code1 {/* in the actual UI, the menu item's label will be the string returned by the get_title() method*/}
+          code2 {/* see the file inpainting.cxx for definitions of these labels */}
+          code3 {o->label(I->get_title(I->Confidence).c_str());}
+        }
+        menuitem {} {
+          label inpainted
+          callback {// display the image in a panel of the UI
+// the function below is defined in fluid
+display_inpainting_image(left_panel, I->Inpainted);
+I->debug_display_left(I->Inpainted);}
+          xywh {60 60 100 20}
+          code0 {/* this snippet of code allows the menu item to have a variable appearance */}
+          code1 {/* in the actual UI, the menu item's label will be the string returned by the get_title() method*/}
+          code2 {/* see the file inpainting.cxx for definitions of these labels */}
+          code3 {o->label(I->get_title(I->Inpainted).c_str());}
+        }
+      }
+      Fl_Choice {} {
+        label {Right  Image}
+        tooltip {Choose the image to display in the right panel} xywh {165 20 150 25} down_box BORDER_BOX align 5
+      } {
+        menuitem {} {
+          label {  }
+          xywh {10 10 100 20}
+        }
+        menuitem {} {
+          label source
+          callback {// display the image in a panel of the UI
+// the function below is defined in fluid
+display_inpainting_image(right_panel, I->Source);
+I->debug_display_right(I->Source);}
+          xywh {25 25 100 20}
+          code0 {/* this snippet of code allows the menu item to have a variable appearance */}
+          code1 {/* in the actual UI, the menu item's label will be the string returned by the get_title() method*/}
+          code2 {/* see the file inpainting.cxx for definitions of these labels */}
+          code3 {o->label(I->get_title(I->Source).c_str());}
+        }
+        menuitem {} {
+          label mask
+          callback {// display the image in a panel of the UI
+// the function below is defined in fluid
+// this function is used for displaying 1-band images 
+display_inpainting_image1(right_panel, I->Init_Filled);
+I->debug_display_right(I->Init_Filled);}
+          xywh {65 65 100 20}
+          code0 {/* this snippet of code allows the menu item to have a variable appearance */}
+          code1 {/* in the actual UI, the menu item's label will be the string returned by the get_title() method*/}
+          code2 {/* see the file inpainting.cxx for definitions of these labels */}
+          code3 {o->label(I->get_title(I->Init_Filled).c_str());}
+        }
+        menuitem {} {
+          label {fill front}
+          callback {// display the image in a panel of the UI
+// the function below is defined in fluid
+// this function is used for displaying 1-band images 
+display_inpainting_image1(right_panel, I->Fill_Front);
+I->debug_display_right(I->Fill_Front);}
+          xywh {75 75 100 20}
+          code0 {/* this snippet of code allows the menu item to have a variable appearance */}
+          code1 {/* in the actual UI, the menu item's label will be the string returned by the get_title() method*/}
+          code2 {/* see the file inpainting.cxx for definitions of these labels */}
+          code3 {o->label(I->get_title(I->Fill_Front).c_str());}
+        }
+        menuitem {} {
+          label unfilled
+          callback {// display the image in a panel of the UI
+// the function below is defined in fluid
+// this function is used for displaying 1-band images 
+display_inpainting_image1(right_panel, I->Unfilled);
+I->debug_display_right(I->Unfilled);}
+          xywh {75 75 100 20}
+          code0 {/* this snippet of code allows the menu item to have a variable appearance */}
+          code1 {/* in the actual UI, the menu item's label will be the string returned by the get_title() method*/}
+          code2 {/* see the file inpainting.cxx for definitions of these labels */}
+          code3 {o->label(I->get_title(I->Unfilled).c_str());}
+        }
+        menuitem {} {
+          label confidence
+          callback {// display the image in a panel of the UI
+// the function below is defined in fluid
+// this function is used for displaying 1-band images 
+display_inpainting_image1(right_panel, I->Confidence);
+I->debug_display_right(I->Confidence);}
+          xywh {75 75 100 20}
+          code0 {/* this snippet of code allows the menu item to have a variable appearance */}
+          code1 {/* in the actual UI, the menu item's label will be the string returned by the get_title() method*/}
+          code2 {/* see the file inpainting.cxx for definitions of these labels */}
+          code3 {o->label(I->get_title(I->Confidence).c_str());}
+        }
+        menuitem {} {
+          label inpainted
+          callback {// display the image in a panel of the UI
+// the function below is defined in fluid
+display_inpainting_image(right_panel, I->Inpainted);
+I->debug_display_right(I->Inpainted);}
+          xywh {75 75 100 20}
+          code0 {/* this snippet of code allows the menu item to have a variable appearance */}
+          code1 {/* in the actual UI, the menu item's label will be the string returned by the get_title() method*/}
+          code2 {/* see the file inpainting.cxx for definitions of these labels */}
+          code3 {o->label(I->get_title(I->Inpainted).c_str());}
+        }
+      }
+      Fl_Input {} {
+        label {Iterations Per Run}
+        callback {{
+  int i;
+
+  sscanf(((Fl_Input *)o)->value(),"%d", &i);
+  if (i > 0)
+      inpainting_iterations_per_step = i;
+}}
+        tooltip {How many iterations should be run each time "Run Algorithm" is selected from the menu} xywh {5 65 150 25} align 5 when 8
+      }
+      Fl_Counter {} {
+        label {Patch Radius}
+        callback {I->set_patch_radius((int)(((Fl_Counter *)o)->value()));}
+        tooltip {The radius of the patch (patch width & height will be 2*radius+1)} xywh {165 65 150 25} align 5 minimum 1 maximum 20 step 1 value 4
+      }
+      Fl_Group {} {
+        label {Show Debug Info} open
+        xywh {5 110 150 25} align 5
+      } {
+        Fl_Check_Button {} {
+          label patches
+          callback {I->debug_show_PSI(((Fl_Check_Button *)o)->value());}
+          tooltip {Show highest-priority patch on fill front (yellow) and most similar patch in source image (red) in the current iteration} xywh {15 110 15 25} down_box DOWN_BOX labelsize 9 align 6
+        }
+        Fl_Check_Button {} {
+          label vectors
+          callback {I->debug_show_vecs(((Fl_Check_Button *)o)->value());}
+          tooltip {Show direction of largest gradient (red) and fill front normal (green) at the highest-priority patch in current iteration} xywh {60 110 15 25} down_box DOWN_BOX labelsize 9 align 6
+        }
+        Fl_Check_Button {} {
+          label intensities
+          callback {I->debug_print(((Fl_Check_Button *)o)->value());}
+          tooltip {Enable printing of patch intensities} xywh {105 110 15 25} down_box DOWN_BOX labelsize 9 align 6
+        }
+      }
+      Fl_Counter {} {
+        label {Brush Radius}
+        callback {left_panel->set_brush_radius(((Fl_Counter *)o)->value());
+right_panel->set_brush_radius(((Fl_Counter *)o)->value());}
+        tooltip {The radius of the mask brush} xywh {165 110 150 25} align 5 minimum 1 maximum 100 step 1 value 10
+      }
+    }
+  }
+} 

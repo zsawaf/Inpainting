@@ -1,0 +1,263 @@
+Assignment #2
+Kyros Kutulakos
+
+Notes on the starter code for the inpainting application 
+
+---------------------------------------------------------
+This code extends the code given for Assignment #1. I am
+therefore only including notes/comments about files that
+were added/changed from those given out with Assignment 1
+---------------------------------------------------------
+
+---------------
+GENERAL REMARKS
+---------------
+
+A. SOLUTION EXECUTABLE
+
+  I am supplying two full implementations of the assignment:
+
+    bin/VisComp_full.exe	     win32 executable compiled with VC++6.0
+			             under winXP
+    bin/viscomp_full	     	     linux executable compiled on CDF
+
+
+  The executable operates in three modes:
+
+  1. Non-interactive (ie. batch) mode:
+
+     You supply all images as command-line arguments and run
+         viscomp_full -no_gui -inpainting [other command-line arguments]
+     from the command line to run the inpainting algorithm
+
+     To see the various command-line options, type 
+	 viscomp_full -help
+
+  2. Fully interactive mode:
+
+     You just type 'viscomp_full' and a window opens up
+     with two panels for displaying images. You can now use the 
+     menus or keyboard shortcuts to load images and run the code.
+
+  3. Combination:
+
+     If you don't supply the '-no_gui' option on the command line but
+     supply command-line options for loading some (or all) of the 
+     images. In this case, the images will be loaded, the inpainting
+     algorithm will be run if all the required images have been 
+     supplied and, finally, the UI will be displayed.
+
+  4. To quickly get a feel for the inpainting procedure & the implementation:
+
+     - Type 'viscomp_full' on the command line.
+     - With the mouse anywhere on the UI window that opens, type
+          <Alt>-s  and enter the file test_images/tiny/input.jpg in the dialog box
+          <Alt>-d  and enter the file test_images/tiny/input-mask.jpg in the dialog box
+          <Ctrl>-d to display the Inpainting Control Window
+     - Click on the buttons labeled "patches" "vectors" and "intensities"
+     - With the mouse anywhere on the main UI window, type <Alt>-n to run
+       one iteration of the inpainting algorithm.
+     - In the control window, select "Inpainted" from the Left Image drop-down
+       menu
+     - In the control window, select "Fill Front" from the Right Image 
+       drop-down menu
+     - You should now see the image being inpainted on the left and an
+       outline of the "fill front" (ie. the boundary between filled and
+       unfilled regions) on the right. 
+     - In addition, the following information is displayed:
+         * yellow box: the patch on the fill front that was 
+                       selected for inpainting in the current iteration
+		       (ie. the patch with the highest priority)
+         * red box:    the patch in the source image whose pixels were 
+                       copied into the unfilled pixels of the patch shown 
+                       in yellow (ie. the red box indicates the patch chosen 
+                       by the patch_db.lookup() method)
+         * green vector: the normal to the fill front curve (ie. the vector 
+                         computed by the compute_normal() function)
+         * red vector:   the unit vector in the direction of the image 
+                         gradient (ie. the vector computed by the 
+                                       compute_gradient() function).
+         * terminal window: the grayscale intensities of the source patch
+                            are sent to stderr
+       you can control which of these pieces of information is displayed
+       by clicking on the 3 buttons of the Inpainting Control window
+     - If you choose "Confidence" from the left or right drop-down box in
+       in the Inpainting Control window, you can also view the confidence
+       term of individual pixels (i.e., the value computed by the compute_C() 
+       function)
+     - Press <alt-n> repeatedly to execute additional iterations; both
+       images in the panels will be updated after each iteration
+     - Press <alt-r> to run the inpainting algorithm to completion. It
+       will probably take a couple of minutes to run, during which time
+       the interface window will not refresh.
+
+  5. Additional functinalities: Mask drawing
+
+     - Select "Draw Left" from the drop-down menu on the left side of the
+       left panel in the main window.
+     - Left-drag of the mouse draws a full rectangle; Right drag draws
+       a circle. You can control the circle's radius with the "Brush Radius"
+       control in the Inpainting Control window. 
+     - The "Mask Undo" and "Mask Clear" functions undo or clear the 
+       mask being drawn.
+     - You can save your mask into a file by choosing 
+       "Inpainting->Save->Initial Mask" from the main menu. You should
+       save this mask as a pgm or pbm image by specifying the extension 
+       .pbm or .pgm
+
+  6. Additional functionalities: Image transfer
+
+     - After drawing a mask, you can make it the Initial Mask of the
+       inpainting algorithm without first saving it to a file by choosing
+       "Inpainting->Transfer->Drawing->Initial Mask" from the main menu
+     - Similarly, you can make an inpainted image the source image for
+       a second run of the algorithm by choosing
+       "Inpainting->Transfer->Drawing->Inpainted->Source" from the main menu.
+     - To do repeated 'touch-ups' to a photo you can run the inpainting
+       algorithm once, make the inpainted image the source image, draw a
+       mask using the drawing facility, make that mask the Initial Mask,
+       and run the inpainting algorithm again.
+
+  Note: The mask drawing facility is a very basic one; it copies the
+        contents of the GL drawing buffer directly into a file (or a VXL
+        image) so its resolution is limited to the resolution of the
+        openGL panel. To get higher quality masks, you can use a program
+        such as 'gimp' available on CDF, or Adobe Photoshop.
+
+
+C.  INTERACTIVE IMAGE VIEWING
+    
+    - The only new feature here is a "canonical" view button that, when
+      clicked, makes the image will the opengl panel (which preserving
+      the image's aspect ratio)
+  
+
+---------------------
+STRUCTURE OF THE CODE
+---------------------
+
+1. NOTES
+
+  * All source and header files are in the src directory
+  * You should not modify ANY files in src/ except for the 
+    file src/inpainting/inpainting_eval.cxx and the
+    file src/inpainting/patch_db.cxx
+  * All your code should go in the src/inpainting directory.
+    You are free to distribute your code in as many 
+    additional files as you want, as long as they remain in that
+    directory. We will be running scripts to compile and run your
+    code automatically, and code outside those directories will be
+    ignored.
+
+
+2. FILES IN THE DIRECTORY src/ that were changed/added since Assignment 1
+
+  bin/viscomp      Executable of the "starter" implementation. This is
+		   created by compiling the code you already have.
+                   You will need to extend it so that it matches the exact
+		   behavior of the full implementation. Run this after
+		   becoming familiar with the full implementation.
+
+  Makefile	   Makefile that buids the starter executable by 
+		   running 'make' in the src/ directory
+
+  main.cxx:	   Top-level function. The only addition is code in
+		   function process_args() for processing the command-line
+                   arguments for the inpainting algorithm.
+
+  fltk_includes.h  Include files used by the FULL implementation. Ordinarily,
+  vxl_includes.h   you should not need to include any more VXL or FLTK 
+                   include files to get your full implementation to compile
+		   correctly. A few more entries are added to vxl_includes.h
+                   for Assignment 2.
+
+3. FILES IN THE DIRECTORY src/gl
+
+  gl/
+  Texture.cxx      Helper functions that you do not need to read
+  Texture.h        or understand. The only change here is a routine
+  glutils.cxx      that copies a gl panel's alpha component into a 
+  glutils.h:       bool VXL image
+
+4. FILES IN DIRECTORY src/file
+  
+  load_image.cxx   The only addition here is a routine for loading single-band
+  load_image.h     images (eg. a mask).
+
+5. FILES IN THE DIRECTORY src/inpainting
+
+  inpainting.h             You must read this file carefully. It contains
+		           a list of all top-level methods related to the 
+                           inpainting procedure. You aren't supposed to 
+                           implement any of these methods, but the ones
+                           you have to implement are called by them
+
+  psi.h                    Declarations for the class psi, used to represent image
+                           patches. You should understand the methods of this class
+                           well, as you may want to use them in your implementation.
+
+                           The file also contains the declaration of the patch_db
+                           class, whose lookup() method you must implement. You must
+                           look at this portion of the file carefully, as it gives
+                           detailed specs about the lookup method.
+
+  inpainting_eval.h        You must thoroughly digest this file. This file
+                           contains the specs for 3 of the methods you have
+                           to implement (ie. input parameters, 
+			   output parameters of the various methods you
+			   should implement, etc).
+
+  inpainting_algorithm.cxx Top-level routines for the inpainting file. You
+                           must thoroughly digest it, especially the 
+                           inpaint_region() method, whose implementation 
+                           follows closely the pseudocode in Table 1 of the paper.
+
+  inpainting_debug.h       This file contains the routines responsible for drawing
+                           the vectors and red and yellow patches when the debugging
+                           options are set in the Inpainting Control window. While you
+                           don't need to understand how they work, you should try to 
+                           use them as much as possible when debugging your code to
+                           make sure that the algorithm behaves correctly.
+
+  inpainting.cxx           This file contains lots of little nitty-gritty
+			   routines for accessing the elements of the
+			   inpainting class. You may want to read it.
+
+  inpainting_eval.cxx      This is where YOUR code goes!! Clearly, you need
+			   to fully understand the pieces of code already
+			   supplied.
+
+  patch_db.cxx             This is also where a portion of your code goes (ie.
+                           patch_db::lookup() method).
+
+  psi.cxx                  Implementation of the psi class. You don't need to understand
+                           the implementation the psi methods well, although you may 
+                           find it helpful to know how they work.
+
+6. CHANGES IN THE DIRECTORY src/imdraw
+
+  imdraw_objects.h This is the main new class in the supplied code. It includes
+                   a set of geometric object classes (circles, rectangles, vectors)
+                   that enable geometric primitives to be drawn in an opengl panel. 
+
+                   The file also defines a display_list class, that manages the
+                   display of geometric objects on the screen. You do not need to 
+                   undestand the code here for the purposes of the assignment, but
+                   it should give you an idea of how to write code that manages and 
+                   controls the display of geometric primitives.
+
+  imdraw.h	   The class now has a few new members, controlling the drawing
+                   of 2D objects on the display panel(s)
+
+  imdraw_draw.cpp  The main routine for drawing graphics.
+  
+  imdraw_handle.cpp The event handler in this file was extended to provide the
+                    mask drawing functionalities used in Assignment 2. You do not need
+                    to read or understand this file.
+
+7. Files in directory VC++/
+
+  This directory contains the VC++6.0 workspace and project for
+  compiling the code under windows XP. Just open up the workspace and
+  type 'build all' to build the starter code.
+

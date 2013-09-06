@@ -1,0 +1,113 @@
+------------------------------------------------------------------
+Please write your answer below each question
+------------------------------------------------------------------
+
+------------------------------------------------------------------
+Part B.1 Questions (you must answer questions 1 & 2 to
+                    get any credit for Part B.1!!)
+------------------------------------------------------------------
+
+ 1. Why did the inpainting algorithm work well on your first
+    dataset (with Source1, Mask1 as input)?
+
+	Because the background was almost constant in intensity, therefore
+	the algorithm didn't have a lot to do in terms of finding best match
+	patches. Since most patches had similar sum of squares. 
+
+  I just took a bad mask. That's why it's not very good. But in theory it should
+  work.
+
+ 2. Why is your second dataset (Source2, Mask2) a "bad" case for 
+    inpaiting? Specifically why do you expect the algorithm to 
+    perform poorly on the Source2 image for EVERY setting of the 
+    patch radius?
+
+	Because the background was detailed with a lot of different color differences,
+	so it would be difficult if not impossible to find another patch to substitute
+	for this one. Since the color difference variates a lot. 
+
+	
+
+------------------------------------------------------------------
+Part B.2 Questions
+------------------------------------------------------------------
+
+Question 1 (5 points)
+
+The top-level loop of the inpainting algorithm is implemented by
+as a while loop in method
+inpainting::compute() in file src/inpainting/inpainting_algorithm.cxx
+
+Even though this loop causes the implementation to behave exactly
+"as advertised" in the paper for most cases of source images and 
+initial masks, there are situations where this is *not* the case. 
+In such cases, the implementation is expected to generate inpainted
+images that have significant artifacts. 
+
+You need to identify what the problem is with this particular loop.
+
+[Hint: To answer this question, you do *not* need to look at the code 
+       of the inpaint_region() and find_first_unfilled_pixel() methods 
+       or of the vil_trace_8con_boundary() function (although you do need
+       to understand what these methods do). Also, the answer
+       has nothing to do with variables iterations_done, max_iterations,
+       and inpainted_new_region]
+
+
+------------------------------------------------------------------
+    
+Question 2 (15 points)
+
+Prove that if gamma(t) = ( x(t), y(t) ) is a 2D curve, the curvature
+k(t) at point gamma(t) is given by the expression
+
+                 2     2     
+           dx   d y   d x   dy
+           -- * --- - --- * --
+                  2     2
+           dt   dt    dt    dt
+   k(t) = -------------------------
+           -                 -  3/2
+          |   dx  2    dy  2  |
+          | ( -- ) + ( -- )   |
+          |   dt       dt     |
+           -                 -
+
+(This question is identical to the one on Slide 13 of Lecture 10)
+
+It's hard to write up the proof on a text file with all the math symbols
+so bear with me :)
+
+Let's suppose that we have a(t) = (x(t), y(t)) and let a'(t) = (x'(t), y'(t))
+be valid for every parameter t. 
+
+We are given that the arc length of the curve is 
+s(t) = integral 0 to t sqrt(x'(t)^2 + y'(t)^2)) dt <=> ||a'(t)||dt. 
+
+From there we conclude ds = d(above integral) = sqrt(x'(t)^2 + y'(t)^2) dt
+then dt/ds = 1/sqrt(x'(t)^2 + y'(t)^2) then ds = ||a'(t)||dt
+
+Let's take the tangent a'(t) and the angle it makes relative to the x-axis then
+a'(t) = ||a'(t)||(cos a(t))(sin a(t)). Then dx/dt gives the curvature. 
+
+dx/dt will depend on the parameterization, and we will use arc length
+so k=da/dt . dt/ds
+
+To get a(t) from a'(t) (defined in the beginning) it is clear that a(t) = y'(t)/x'(t)
+
+the derivative of that will give us sec^2(x(t)).a'(t) <=> y''(t).x'(t) - x''(t).y'(t) / x'(t)^2
+
+sec^2(a(t)) = tan^2(a(t)) + 1 = x'(t)^2 / (y'(t) + x'(t))^2 
+
+now putting everything together:
+
+sec^2(a(t)).a'(t) * sec^2(a(t)) = y''(t).x'(t) - x''(t).y'(t) / x'(t)^2 * x'(t)^2 / (y'(t)^2 + x'(t)^2)^2 
+= y''(t).x'(t) - x''(t).y'(t) / (y'(t)^2 + x'(t)^2)^2
+
+recall k=da/dt . dt/ds = da/ds * 1/sqrt(y'(t)^2 + x'(t)^2)^2)
+=> y''(t).x'(t) - x''(t).y'(t) / (y'(t)^2 + x'(t)^2)^2 * 1/sqrt(y'(t)^2 + x'(t)^2)^2)
+=> y''(t).x'(t) - x''(t).y'(t) / (y'(t)^2 + x'(t)^2)^2 / sqrt(y'(t)^2 + x'(t)^2)^2)*(y'(t)^2 + x'(t)^2)^2
+=> y''(t).x'(t) - x''(t).y'(t) / (y'(t)^2 + x'(t)^2)^2 / (y'(t)^2 + x'(t)^2)^3/2
+------------------------------------------------------------------
+    
+

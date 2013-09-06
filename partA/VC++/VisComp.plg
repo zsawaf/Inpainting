@@ -1,0 +1,50 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: scissor - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\kyros\LOCALS~1\Temp\RSP8A1.tmp" with contents
+[
+/nologo /MD /GX /Z7 /Ot /Op /Ob2 /I "../../../../../fltk-1.1.6" /I "../../../../../vxl-1.3.0" /I "../../../../../vxl-1.3.0/vcl" /I "../../../../../vxl-1.3.0/vcl/config.win32/vc60" /I "../../../../../vxl-1.3.0/core" /I "../../../../../win32/core" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "WIN32_LEAN_AND_MEAN" /D "VC_EXTRA_LEAN" /D "WIN32_EXTRA_LEAN" /FAs /Fa"..\bin/" /FR"..\bin/" /Fp"..\bin/VisComp.pch" /YX /Fo"..\bin/" /Fd"..\bin/" /FD /o /win32 /c 
+"F:\CSC320\distribution\320\Assignments\Inpainting\partA\src\inpainting\inpainting_eval.cxx"
+]
+Creating command line "cl.exe @C:\DOCUME~1\kyros\LOCALS~1\Temp\RSP8A1.tmp" 
+Creating temporary file "C:\DOCUME~1\kyros\LOCALS~1\Temp\RSP8A2.tmp" with contents
+[
+opengl32.lib glu32.lib wsock32.lib comctl32.lib fltkd.lib fltkgld.lib vcl.lib vil.lib vil_algo.lib vul.lib vnl.lib vnl_algo.lib vnl_io.lib netlib.lib png.lib tiff.lib jpeg.lib z.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /incremental:no /pdb:"..\bin/VisComp.pdb" /debug /machine:I386 /nodefaultlib:"libcd" /nodefaultlib:"libcmtd" /nodefaultlib:"libcimtd.lib" /nodefaultlib:"msvcrtd.lib" /out:"..\bin/VisComp.exe" /pdbtype:sept /libpath:"../../../../../fltk-1.1.6/lib" /libpath:"../../../../../win32/lib/Debug" 
+"\CSC320\distribution\320\Assignments\Inpainting\partA\bin\glutils.obj"
+"\CSC320\distribution\320\Assignments\Inpainting\partA\bin\imdraw_draw.obj"
+"\CSC320\distribution\320\Assignments\Inpainting\partA\bin\imdraw_handle.obj"
+"\CSC320\distribution\320\Assignments\Inpainting\partA\bin\imdraw_init.obj"
+"\CSC320\distribution\320\Assignments\Inpainting\partA\bin\imdraw_object.obj"
+"\CSC320\distribution\320\Assignments\Inpainting\partA\bin\imdraw_utils.obj"
+"\CSC320\distribution\320\Assignments\Inpainting\partA\bin\inpainting.obj"
+"\CSC320\distribution\320\Assignments\Inpainting\partA\bin\inpainting_algorithm.obj"
+"\CSC320\distribution\320\Assignments\Inpainting\partA\bin\inpainting_debug.obj"
+"\CSC320\distribution\320\Assignments\Inpainting\partA\bin\inpainting_eval.obj"
+"\CSC320\distribution\320\Assignments\Inpainting\partA\bin\load_image.obj"
+"\CSC320\distribution\320\Assignments\Inpainting\partA\bin\main.obj"
+"\CSC320\distribution\320\Assignments\Inpainting\partA\bin\matting.obj"
+"\CSC320\distribution\320\Assignments\Inpainting\partA\bin\matting_algorithm.obj"
+"\CSC320\distribution\320\Assignments\Inpainting\partA\bin\patch_db.obj"
+"\CSC320\distribution\320\Assignments\Inpainting\partA\bin\psi.obj"
+"\CSC320\distribution\320\Assignments\Inpainting\partA\bin\read_drawing.obj"
+"\CSC320\distribution\320\Assignments\Inpainting\partA\bin\Texture.obj"
+"\CSC320\distribution\320\Assignments\Inpainting\partA\bin\VisCompUI.obj"
+]
+Creating command line "link.exe @C:\DOCUME~1\kyros\LOCALS~1\Temp\RSP8A2.tmp"
+<h3>Output Window</h3>
+Compiling...
+inpainting_eval.cxx
+Linking...
+
+
+
+<h3>Results</h3>
+VisComp.exe - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>
